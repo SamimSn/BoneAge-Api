@@ -11,7 +11,7 @@ class BoneImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BoneImage
-        fields = ["uuid", "image_url", "result", "image"]
+        fields = ["image_url", "result", "image"]
 
     def get_result(self, obj):
         total_months = obj.result
