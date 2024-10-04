@@ -12,7 +12,7 @@ class BoneImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BoneImage
-        fields = ["image_url", "result", "image"]
+        fields = ["image_url", "years", "months", "image"]
 
     def get_years(self, obj):
         return int(obj.result // 12)
