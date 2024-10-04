@@ -21,7 +21,7 @@ class BoneImageSerializer(serializers.ModelSerializer):
         return int(obj.result % 12)
 
     def get_image_url(self, obj):
-        return f"https://hoomprovpn.info/media/bone_images/{obj.image.name}"
+        return f"https://hoomprovpn.info/{obj.image.name}"
 
     def validate_image(self, value):
         # 1. Check file MIME type
