@@ -6,21 +6,19 @@ from .models import BoneImage
 class BoneImageSerializer(serializers.ModelSerializer):
 
     image_url = serializers.SerializerMethodField()
-    result = serializers.SerializerMethodField(read_only=True)
     image = serializers.ImageField(write_only=True)
+    years = serializers.SerializerMethodField(read_only=True)
+    months = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = BoneImage
         fields = ["image_url", "result", "image"]
 
-    def get_result(self, obj):
-        total_months = obj.result
-        years = int(total_months // 12)
-        months = int(total_months % 12)
-        return {
-            "years": years,
-            "months": months,
-        }
+    def get_years(self, obj):
+        return int(obj.result // 12)
+
+    def get_months(self, obj):
+        return int(obj.result % 12)
 
     def get_image_url(self, obj):
         return f"https://hoomprovpn.info/{obj.uuid}"
