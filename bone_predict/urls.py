@@ -4,6 +4,6 @@ from .views import BoneImageViewset
 
 router = DefaultRouter()
 
-router.register(r"bone_predict", BoneImageViewset, basename="bone-predict")
+router.register(r"", BoneImageViewset, basename="bone-predict")
 
 urlpatterns = [path("", include(router.urls))]
