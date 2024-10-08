@@ -17,7 +17,7 @@ class BoneImageViewset(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = self.perform_create(serializer)
-        instance.result = predict_in_thread(instance.image_raw)
+        instance.result = predict_in_thread(instance.image_raw.url)
         instance.save()
         response_data = {
             "uuid": serializer.instance.uuid,
