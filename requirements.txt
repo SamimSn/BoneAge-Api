@@ -4,3 +4,4 @@ django-cors-headers
 tensorflow
 whitenoise
 pillow
+ultralytics

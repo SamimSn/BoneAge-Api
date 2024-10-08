@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Profile
 from .serializers import BoneImageSerializer
-from .utils import predict_in_thread
+from .utils import predict_bone_age_in_thread
 
 
 class BoneImageViewset(ModelViewSet):
@@ -17,7 +17,8 @@ class BoneImageViewset(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = self.perform_create(serializer)
-        instance.result = predict_in_thread(instance.image_raw.url)
+        instance.result = predict_bone_age_in_thread(instance.image_raw.url)
+        instance.image_marked = instance.image_raw
         instance.save()
         response_data = {
             "uuid": serializer.instance.uuid,

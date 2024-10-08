@@ -1,6 +1,7 @@
 import mimetypes
 from rest_framework import serializers
 from django.conf import settings
+from .utils import predict_is_image_valid_in_thread
 
 
 class BonePredictService:
@@ -23,6 +24,12 @@ class BonePredictService:
         if value.size > size:
             raise serializers.ValidationError(
                 f"File size must not exceed {size} MB. The uploaded file is {value.size / (1024 * 1024):.2f} MB."
+            )
+
+    def validate_image(self, value):
+        if not predict_is_image_valid_in_thread(value):
+            raise serializers.ValidationError(
+                "The uploaded image is invalid according to the model prediction."
             )
 
     def get_fields(self, fields, view):
