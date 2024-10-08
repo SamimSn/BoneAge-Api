@@ -16,15 +16,13 @@ class BoneImageViewset(ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance = self.perform_create(serializer)
-        instance.result = predict_bone_age_in_thread(instance.image_raw.url)
+        instance = serializer.save()
+        instance.result = predict_bone_age_in_thread(instance.image_raw.path)
         instance.image_marked = instance.image_raw
         instance.save()
         response_data = {
-            "uuid": serializer.instance.uuid,
-            "image_raw": request.build_absolute_uri(
-                serializer.instance.image_raw.url
-            ),
+            "uuid": instance.uuid,
+            "image_raw": request.build_absolute_uri(instance.image_raw.url),
         }
         headers = self.get_success_headers(serializer.data)
         return Response(
@@ -41,8 +39,6 @@ class BoneImageViewset(ModelViewSet):
         self.perform_update(serializer)
 
         if getattr(instance, "_prefetched_objects_cache", None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)

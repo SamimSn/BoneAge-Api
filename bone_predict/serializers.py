@@ -22,10 +22,12 @@ class BoneImageSerializer(serializers.ModelSerializer):
         ]
 
     def get_result(self, obj):
-        months = obj.result % 12
-        years = obj.result // 12
-
-        return {"year(s)": years, "month(s)": months}
+        result = obj.result
+        if result:
+            months = int(result) % 12
+            years = int(result) // 12
+            return {"year(s)": years, "month(s)": months}
+        return None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

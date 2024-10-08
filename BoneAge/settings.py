@@ -98,7 +98,7 @@ DATABASES = {
     }
 }
 
-IMAGE_SIZE = 15 * 1024 * 1024  # 15 MB limit
+IMAGE_SIZE = 25 * 1024 * 1024  # 25 MB limit also change in nginx
 
 
 # Password validation
