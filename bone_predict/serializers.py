@@ -1,48 +1,57 @@
-import mimetypes
 from rest_framework import serializers
-from .models import BoneImage
+from .models import Profile
+from .services import bone_predict_service
 
 
 class BoneImageSerializer(serializers.ModelSerializer):
-
-    image_url = serializers.SerializerMethodField()
-    image = serializers.ImageField(write_only=True)
-    years = serializers.SerializerMethodField(read_only=True)
-    months = serializers.SerializerMethodField(read_only=True)
+    result = serializers.SerializerMethodField()
 
     class Meta:
-        model = BoneImage
-        fields = ["image_url", "years", "months", "image"]
-
-    def get_years(self, obj):
-        return int(obj.result // 12)
-
-    def get_months(self, obj):
-        return int(obj.result % 12)
-
-    def get_image_url(self, obj: BoneImage):
-        return f"https://hoomprovpn.info/{obj.image.url}"
-
-    def validate_image(self, value):
-        # 1. Check file MIME type
-        valid_mime_types = [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/bmp",
+        model = Profile
+        fields = [
+            "uuid",
+            "created_at",
+            "updated_at",
+            "image_raw",
+            "image_marked",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "age",
+            "result",
         ]
-        file_mime_type, _ = mimetypes.guess_type(value.name)
 
-        if file_mime_type not in valid_mime_types:
-            raise serializers.ValidationError(
-                "Unsupported file type. Only JPEG, PNG, JPG, and BMP files are allowed."
+    def get_result(self, obj):
+        months = obj.result % 12
+        years = obj.result // 12
+
+        return {"year(s)": years, "month(s)": months}
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get("request")
+        if instance.image_raw:
+            representation["image_raw"] = request.build_absolute_uri(
+                instance.image_raw.url
             )
-
-        # 2. Check file size (5 MB = 5 * 1024 * 1024 bytes)
-        max_size = 5 * 1024 * 1024  # 5 MB limit
-        if value.size > max_size:
-            raise serializers.ValidationError(
-                f"File size must not exceed 5 MB. The uploaded file is {value.size / (1024 * 1024):.2f} MB."
+        if instance.image_marked:
+            representation["image_marked"] = request.build_absolute_uri(
+                instance.image_marked.url
             )
+        return representation
 
+    def validate_image_raw(self, value):
+        bone_predict_service.validate_image_format(value)
+        bone_predict_service.validate_image_size(value)
         return value
+
+    def validate(self, attrs):
+        view = self.context.get("view")
+        bone_predict_service.validate(attrs, view)
+        return attrs
+
+    def get_fields(self):
+        fields = super().get_fields()
+        view = self.context.get("view")
+        bone_predict_service.get_fields(fields, view)
+        return fields
