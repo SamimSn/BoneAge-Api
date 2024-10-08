@@ -27,6 +27,7 @@ class BonePredictService:
             )
 
     def validate_image(self, value):
+        print(f"search me: {value.image.filename}")
         if not predict_is_image_valid_in_thread(value.image.filename):
             raise serializers.ValidationError(
                 "The uploaded image is invalid according to the model prediction."
