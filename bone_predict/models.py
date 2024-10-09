@@ -29,9 +29,7 @@ class Profile(models.Model):
 
 
 class TemporaryImage(models.Model):
-    image = models.ImageField(
-        upload_to="images_temporary/", null=False, blank=False
-    )
+    image = models.ImageField(null=False, blank=False)
 
     def delete(self, *args, **kwargs):
         if self.image and os.path.isfile(self.image.path):
