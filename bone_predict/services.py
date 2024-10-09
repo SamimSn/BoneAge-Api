@@ -2,6 +2,7 @@ import mimetypes
 from rest_framework import serializers
 from django.conf import settings
 from .utils import predict_is_image_valid_in_thread
+from .models import TemporaryImage
 
 
 class BonePredictService:
@@ -27,11 +28,17 @@ class BonePredictService:
             )
 
     def validate_image(self, value):
-        print(f"search me: {value.image.filename}")
-        if not predict_is_image_valid_in_thread(value.image.filename):
+        temp_image = TemporaryImage.objects.create(image=value)
+        temp_image.save()
+        if not predict_is_image_valid_in_thread(temp_image.image.path):
+            temp_image.delete()
+            # temp_image.save()
             raise serializers.ValidationError(
                 "The uploaded image is invalid according to the model prediction."
             )
+        else:
+            temp_image.delete()
+            # temp_image.save()
 
     def get_fields(self, fields, view):
         if fields.get("id"):
