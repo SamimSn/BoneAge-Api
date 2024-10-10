@@ -45,7 +45,7 @@ class BoneImageSerializer(serializers.ModelSerializer):
     def validate_image_raw(self, value):
         bone_predict_service.validate_image_format(value)
         bone_predict_service.validate_image_size(value)
-        # bone_predict_service.validate_image(value)
+        bone_predict_service.validate_image(value)
         return value
 
     def validate(self, attrs):
